@@ -8,4 +8,5 @@ window.AKCONFIG = {
   library:  "Shared Documents",    // same values as the AK Planner web part
   root:     "AK Planner",
   list:     "AK Planner Data"
+  admins:   ["akhil@bhaaje.com"]                     // work emails that are always Admin, e.g. ["pm@company.com"]. Others are set in the app under ⋯ › People and roles.
 };
