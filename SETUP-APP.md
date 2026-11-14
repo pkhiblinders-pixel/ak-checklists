@@ -83,6 +83,51 @@ The **Android** and **iPhone** buttons at the top right of the app show these sa
 
 ---
 
+## Sign-in
+
+- **Nothing in the app opens until the person signs in** with their company Microsoft 365 account. They also need access to the AMR Living Spaces SharePoint site.
+- **If `config.js` isn't filled in**, the app shows "The app isn't connected to Microsoft 365 yet" and nobody can open it.
+- **After the first sign-in**, the app keeps working offline on that phone.
+- **⋯ › Sign out** signs the person out. Work that hasn't synced stays on the phone and syncs at the next sign-in.
+- **The loose `AK_Checklists.html` and `AK_Planner.html` files** only open inside the SharePoint web part or the app. Opening them directly shows a message instead.
+- **Your data** (checklists, plans, drawings, photos) is never in the app files. It lives in SharePoint, and SharePoint only hands it to signed-in people with access.
+- **GitHub Pages is public**, so the app's code and its built-in site layout can be downloaded by anyone who has the link. To make even that private, host the folder on **Azure Static Web Apps** with Microsoft sign-in turned on instead of GitHub Pages.
+
+## When something doesn't work: ⋯ › Connection check
+
+Run it on the phone or computer that has the problem. It checks each of these and says exactly what to fix:
+
+- the settings in `config.js`
+- that the person is signed in
+- the SharePoint permission (admin consent)
+- the site address
+- the data list
+- that the person can save to the list
+- the person's role and why they have it
+- what's waiting to sync
+
+The usual causes:
+
+| What you see | Cause | Fix |
+|---|---|---|
+| Everyone sees everything, and the pill says "On this device" | `config.js` not filled in, or the old `index.html` is still cached | Fill in `config.js`, upload the new files, then open the app twice (the first open fetches the update) |
+| "Permission to use SharePoint" fails | Admin consent missing | Part B, steps 5–6 |
+| "SharePoint site" fails | `siteUrl` is wrong | Use the site address only, e.g. `https://company.sharepoint.com/sites/AMR`, without `/SitePages/...` |
+| "You can save to the list" fails | Person has read-only access | Give them **Edit** (Contribute) on the site |
+
+## Who can do what
+
+| Role | Sees in the app |
+|---|---|
+| **Admin** | Everything: Overview, Site map, Planner (edit), Checklists, Defects, Drawings (upload and delete), Quantities, Tomorrow, Labour, Day end, and **⋯ › People and roles** |
+| **Project manager** | Same as Admin, except People and roles |
+| **Site engineer** | Site map, Checklists, Defects, Drawings (view only), Tomorrow, Labour, Day end |
+
+- **Owners of the SharePoint site** and site collection admins are always **Admin**.
+- To make someone else Admin from the start, add their work email to `admins` in `config.js`, e.g. `admins: ["pm@company.com"]`.
+- Admins set everyone else in the app under **⋯ › People and roles**. Anyone who signs in and isn't listed is a **Site engineer**.
+- The app enforces roles in its screens. Engineers still need **Contribute** access to the SharePoint list `AK Planner Data` and the `AK Planner` folder, because their checklists, photos and reports are saved there.
+
 ## How it works on site
 
 - **Saving.** Every answer, photo, defect and debit note is saved on the phone first. With no signal, the pill at the top right shows **Offline · N waiting**.
@@ -99,6 +144,8 @@ The **Android** and **iPhone** buttons at the top right of the app show these sa
 - **Tomorrow** and **Labour** each make one PDF with the company logo to share on WhatsApp. They can also make one PDF per villa activity, for example:
   `Villa12-Sub_Structure-Footings-Footing_concrete-Schedule-2026-11-13.pdf`
   `Villa12-Sub_Structure-Footings-Footing_concrete-Labour-2026-11-13.pdf`
+
+- **Where schedules and labour reports are kept:** every schedule and labour report is stored automatically when it syncs, in `AK Planner/Daily Reports/Work schedules/<date>` and `AK Planner/Daily Reports/Labour reports/<date>`. The per-activity PDFs go in a `Villa N` subfolder. The **Saved schedules** list on each page shows past days and whether each file is already in SharePoint.
 
 ## Updating the app
 
